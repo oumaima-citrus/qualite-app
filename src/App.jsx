@@ -680,7 +680,7 @@ function App() {
       }, 300);
     } catch (error) {
       console.error(error);
-      alert("المشكل فالكاميرا. تأكد من السماح للكاميرا.");
+      alert("Problème de caméra. Veuillez vérifier que l’accès à la caméra est autorisé.");
       setCameraOpen(false);
       setPhotoDefectIndex(null);
     }
@@ -712,7 +712,7 @@ function App() {
     const canvas = canvasRef.current;
 
     if (!video.videoWidth || !video.videoHeight) {
-      alert("تسنى شوية حتى تبان الصورة فالكاميرا.");
+      alert("Patientez un instant jusqu’à ce que l’image apparaisse dans la caméra.");
       return;
     }
 
@@ -994,7 +994,7 @@ function App() {
     }
 
     if (records.length === 0) {
-      alert("ما كاين حتى contrôle مسجل فهاد التاريخ");
+      alert("Aucun contrôle enregistré à cette date");
       return;
     }
     const observationFinale =
