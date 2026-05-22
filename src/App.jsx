@@ -195,272 +195,274 @@ function App() {
 
     alert("Sauvegarde exportée avec succès ✅");
   }
-  function exportExcel() {
-   
+ function exportExcel() {
+  console.log("HISTORY =", history);
+
+  const sourceData =
+    history && history.length > 0
+      ? history
+      : JSON.parse(localStorage.getItem("controls")) || [];
+
+  console.log("SOURCE DATA:", sourceData);
+
+  if (!sourceData || sourceData.length === 0) {
+    alert("Aucune donnée à exporter.");
+    return;
+  }
+
   const allData = {};
 
-const sourceData = history && history.length > 0
-  ? history
-  : JSON.parse(localStorage.getItem("controls")) || [];
+  sourceData.forEach((record) => {
+    const dateKey = record.date || "Sans date";
 
-sourceData.forEach((record) => {
-  const dateKey = record.date || "Sans date";
-
-  if (!allData[dateKey]) {
-    allData[dateKey] = [];
-  }
-
-  allData[dateKey].push(record);
-});
-
-    const produit_fini_dataRows = [
-      [
-        "Date",
-        "Heure",
-        "Lot",
-        "Campagne",
-        "Producteur",
-        "Ferme",
-        "Variété",
-        "Calibre",
-        "Total",
-        "Conforme",
-        "Non conforme",
-        "Taux conforme",
-        "Taux non conforme",
-        "Nom contrôleur",
-        "ID de contrôle",
-        "Signature",
-      ],
-    ];
-
-    const ecartsRows = [
-      [
-        "Date",
-        "Heure",
-        "Lot",
-        "Campagne",
-        "Producteur",
-        "Ferme",
-        "Variété",
-        "Calibre",
-        "Total",
-        "Conforme",
-        "Non conforme",
-        "Taux conforme",
-        "Taux non conforme",
-        "Nom contrôleur",
-        "ID de contrôle",
-        "Signature",
-      ],
-    ];
-
-    const defautsRows = [
-      [
-        "Date",
-        "Heure",
-        "Lot",
-        "Calibre",
-        "Type défaut",
-        "Quantité",
-        "Producteur",
-        "Ferme",
-        "Variété",
-      ],
-    ];
-
-    let totalControles = 0;
-    let totalLotsSet = new Set();
-
-    let totalFruits = 0;
-    let totalConformes = 0;
-    let totalNonConformes = 0;
-
-    const defautsCount = {};
-console.log("ALL DATA:", allData);
-    Object.keys(allData).forEach((dateKey) => {
-      (allData[dateKey] || []).forEach((record) => {
-        totalControles += 1;
-        totalLotsSet.add(record.lot_number);
-console.log("TYPE:", record.type);
-console.log("RECORD:", record);
-        if (record.type === "pf" && record.produit_fini_data) {
-          const total = Number(record.produit_fini_data.total || 0);
-          const conforme = Number(record.produit_fini_data.conforme || 0);
-          const nonConforme = Number(record.produit_fini_data.nonConforme || 0);
-
-          totalFruits += total;
-          totalConformes += conforme;
-          totalNonConformes += nonConforme;
-
-          const tauxConforme =
-            total > 0 ? ((conforme / total) * 100).toFixed(2) + "%" : "0%";
-
-          const tauxNonConforme =
-            total > 0 ? ((nonConforme / total) * 100).toFixed(2) + "%" : "0%";
-
-          produit_fini_dataRows.push([
-            record.date || dateKey,
-            record.createdAt || "",
-            record.lot_number || record.lot ||
-            record.campagne || "",
-            record.producteur || "",
-            record.ferme || "",
-            record.variete || "",
-            record.produit_fini_data.calibre || "",
-            total,
-            conforme,
-            nonConforme,
-            tauxConforme,
-            tauxNonConforme,
-            record.controleurName || "",
-            record.controleId || "",
-            record.signature || "",
-          ]);
-        }
-
-        if (record.type === "ecart" && record.ecarts) {
-          const total = Number(record.ecarts.total || 0);
-          const conforme = Number(record.ecarts.conforme || 0);
-          const nonConforme = Number(record.ecarts.nonConforme || 0);
-
-          totalFruits += total;
-          totalConformes += conforme;
-          totalNonConformes += nonConforme;
-
-          const tauxConforme =
-            total > 0 ? ((conforme / total) * 100).toFixed(2) + "%" : "0%";
-
-          const tauxNonConforme =
-            total > 0 ? ((nonConforme / total) * 100).toFixed(2) + "%" : "0%";
-
-          ecartsRows.push([
-            record.date || dateKey,
-            record.createdAt || "",
-            record.lot_number || record.lot ||
-            record.campagne || "",
-            record.producteur || "",
-            record.ferme || "",
-            record.variete || "",
-            record.ecarts.calibre || "",
-            total,
-            conforme,
-            nonConforme,
-            tauxConforme,
-            tauxNonConforme,
-            record.controleurName || "",
-            record.controleId || "",
-            record.signature || "",
-          ]);
-
-          (record.ecarts.defauts || []).forEach((d) => {
-            if (!defautsCount[d.type]) {
-              defautsCount[d.type] = 0;
-            }
-
-            defautsCount[d.type] += Number(d.qty || 0);
-
-            defautsRows.push([
-              record.date || dateKey,
-              record.createdAt || "",
-              record.lot_number || record.lot ||
-              record.ecarts.calibre || "",
-              d.type || "",
-              Number(d.qty || 0),
-              record.producteur || "",
-              record.ferme || "",
-              record.variete || "",
-            ]);
-          });
-        }
-      });
-    });
-
-    if (totalControles === 0) {
-      alert("Aucune donnée à exporter.");
-      return;
+    if (!allData[dateKey]) {
+      allData[dateKey] = [];
     }
 
-    const tauxConformeGlobal =
-      totalFruits > 0 ? ((totalConformes / totalFruits) * 100).toFixed(2) + "%" : "0%";
+    allData[dateKey].push(record);
+  });
 
-    const tauxNonConformeGlobal =
-      totalFruits > 0
-        ? ((totalNonConformes / totalFruits) * 100).toFixed(2) + "%"
-        : "0%";
+  console.log("ALL DATA:", allData);
+  console.log("KEYS:", Object.keys(allData));
 
-    const defautPrincipal =
-      Object.keys(defautsCount).length > 0
-        ? Object.keys(defautsCount).sort(
+  const produit_fini_dataRows = [
+    [
+      "Date",
+      "Heure",
+      "Lot",
+      "Campagne",
+      "Producteur",
+      "Ferme",
+      "Variété",
+      "Calibre",
+      "Total",
+      "Conforme",
+      "Non conforme",
+      "Taux conforme",
+      "Taux non conforme",
+      "Nom contrôleur",
+      "ID de contrôle",
+      "Signature",
+    ],
+  ];
+
+  const ecartsRows = [
+    [
+      "Date",
+      "Heure",
+      "Lot",
+      "Campagne",
+      "Producteur",
+      "Ferme",
+      "Variété",
+      "Calibre",
+      "Total",
+      "Conforme",
+      "Non conforme",
+      "Taux conforme",
+      "Taux non conforme",
+      "Nom contrôleur",
+      "ID de contrôle",
+      "Signature",
+    ],
+  ];
+
+  const defautsRows = [
+    [
+      "Date",
+      "Heure",
+      "Lot",
+      "Calibre",
+      "Type défaut",
+      "Quantité",
+      "Producteur",
+      "Ferme",
+      "Variété",
+    ],
+  ];
+
+  let totalControles = 0;
+  let totalLotsSet = new Set();
+
+  let totalFruits = 0;
+  let totalConformes = 0;
+  let totalNonConformes = 0;
+
+  const defautsCount = {};
+
+  Object.keys(allData).forEach((dateKey) => {
+
+    (allData[dateKey] || []).forEach((record) => {
+console.log("FULL RECORD =", record);
+      console.log("RECORD:", record);
+
+      totalControles += 1;
+
+      totalLotsSet.add(record.lot_number || record.lot || "Sans lot");
+
+      // PRODUIT FINI
+      if (record.produit_fini_data) {
+
+        const total = Number(record.produit_fini_data.total || 0);
+        const conforme = Number(record.produit_fini_data.conforme || 0);
+        const nonConforme = Number(record.produit_fini_data.nonConforme || 0);
+
+        totalFruits += total;
+        totalConformes += conforme;
+        totalNonConformes += nonConforme;
+
+        const tauxConforme =
+          total > 0
+            ? ((conforme / total) * 100).toFixed(2) + "%"
+            : "0%";
+
+        const tauxNonConforme =
+          total > 0
+            ? ((nonConforme / total) * 100).toFixed(2) + "%"
+            : "0%";
+
+        produit_fini_dataRows.push([
+          record.date || dateKey,
+          record.createdAt || "",
+          record.lot_number || record.lot || "",
+          record.campagne || "",
+          record.producteur || "",
+          record.ferme || "",
+          record.variete || "",
+          record.produit_fini_data.calibre || "",
+          total,
+          conforme,
+          nonConforme,
+          tauxConforme,
+          tauxNonConforme,
+          record.controleurName || "",
+          record.controleId || "",
+          record.signature || "",
+        ]);
+      }
+
+      // ECARTS
+      if (record.ecarts) {
+
+        const total = Number(record.ecarts.total || 0);
+        const conforme = Number(record.ecarts.conforme || 0);
+        const nonConforme = Number(record.ecarts.nonConforme || 0);
+
+        totalFruits += total;
+        totalConformes += conforme;
+        totalNonConformes += nonConforme;
+
+        const tauxConforme =
+          total > 0
+            ? ((conforme / total) * 100).toFixed(2) + "%"
+            : "0%";
+
+        const tauxNonConforme =
+          total > 0
+            ? ((nonConforme / total) * 100).toFixed(2) + "%"
+            : "0%";
+
+        ecartsRows.push([
+          record.date || dateKey,
+          record.createdAt || "",
+          record.lot_number || record.lot || "",
+          record.campagne || "",
+          record.producteur || "",
+          record.ferme || "",
+          record.variete || "",
+          record.ecarts.calibre || "",
+          total,
+          conforme,
+          nonConforme,
+          tauxConforme,
+          tauxNonConforme,
+          record.controleurName || "",
+          record.controleId || "",
+          record.signature || "",
+        ]);
+
+        (record.ecarts.defauts || []).forEach((d) => {
+
+          if (!defautsCount[d.type]) {
+            defautsCount[d.type] = 0;
+          }
+
+          defautsCount[d.type] += Number(d.qty || 0);
+
+          defautsRows.push([
+            record.date || dateKey,
+            record.createdAt || "",
+            record.lot_number || record.lot || "",
+            record.ecarts.calibre || "",
+            d.type || "",
+            Number(d.qty || 0),
+            record.producteur || "",
+            record.ferme || "",
+            record.variete || "",
+          ]);
+        });
+      }
+    });
+  });
+
+  console.log("TOTAL CONTROLES:", totalControles);
+
+  if (totalControles === 0) {
+    alert("Aucune donnée à exporter.");
+    return;
+  }
+
+  const tauxConformeGlobal =
+    totalFruits > 0
+      ? ((totalConformes / totalFruits) * 100).toFixed(2) + "%"
+      : "0%";
+
+  const tauxNonConformeGlobal =
+    totalFruits > 0
+      ? ((totalNonConformes / totalFruits) * 100).toFixed(2) + "%"
+      : "0%";
+
+  const defautPrincipal =
+    Object.keys(defautsCount).length > 0
+      ? Object.keys(defautsCount).sort(
           (a, b) => defautsCount[b] - defautsCount[a]
         )[0]
-        : "Aucun défaut";
+      : "Aucun défaut";
 
-    const resumeRows = [
-      ["Résumé général qualité"],
-      [],
-      ["Date export", new Date().toLocaleString()],
-      ["Nombre de lots contrôlés", totalLotsSet.size],
-      ["Nombre total de contrôles", totalControles],
-      ["Total fruits contrôlés", totalFruits],
-      ["Total fruits conformes", totalConformes],
-      ["Total fruits non conformes", totalNonConformes],
-      ["Taux conforme global", tauxConformeGlobal],
-      ["Taux non conforme global", tauxNonConformeGlobal],
-      ["Défaut principal", defautPrincipal],
-    ];
+  const resumeRows = [
+    ["Résumé général qualité"],
+    [],
+    ["Date export", new Date().toLocaleString()],
+    ["Nombre de lots contrôlés", totalLotsSet.size],
+    ["Nombre total de contrôles", totalControles],
+    ["Total fruits contrôlés", totalFruits],
+    ["Total fruits conformes", totalConformes],
+    ["Total fruits non conformes", totalNonConformes],
+    ["Taux conforme global", tauxConformeGlobal],
+    ["Taux non conforme global", tauxNonConformeGlobal],
+    ["Défaut principal", defautPrincipal],
+  ];
 
-    const workbook = XLSX.utils.book_new();
+  const workbook = XLSX.utils.book_new();
 
-    const resumeSheet = XLSX.utils.aoa_to_sheet(resumeRows);
-    const produit_fini_dataSheet = XLSX.utils.aoa_to_sheet(produit_fini_dataRows);
-    const ecartsSheet = XLSX.utils.aoa_to_sheet(ecartsRows);
-    const defautsSheet = XLSX.utils.aoa_to_sheet(defautsRows);
+  const resumeSheet = XLSX.utils.aoa_to_sheet(resumeRows);
+  const produit_fini_dataSheet =
+    XLSX.utils.aoa_to_sheet(produit_fini_dataRows);
+  const ecartsSheet = XLSX.utils.aoa_to_sheet(ecartsRows);
+  const defautsSheet = XLSX.utils.aoa_to_sheet(defautsRows);
 
-    resumeSheet["!cols"] = [{ wch: 30 }, { wch: 25 }];
-    produit_fini_dataSheet["!cols"] = [
-      { wch: 14 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 14 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 16 },
-      { wch: 12 },
-      { wch: 10 },
-      { wch: 12 },
-      { wch: 14 },
-      { wch: 16 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 16 },
-      { wch: 16 },
-    ];
-    ecartsSheet["!cols"] = produit_fini_dataSheet["!cols"];
-    defautsSheet["!cols"] = [
-      { wch: 14 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 28 },
-      { wch: 12 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 16 },
-    ];
+  XLSX.utils.book_append_sheet(workbook, resumeSheet, "Résumé");
+  XLSX.utils.book_append_sheet(workbook, produit_fini_dataSheet, "Produit fini");
+  XLSX.utils.book_append_sheet(workbook, ecartsSheet, "Écarts");
+  XLSX.utils.book_append_sheet(workbook, defautsSheet, "Défauts");
 
-    XLSX.utils.book_append_sheet(workbook, resumeSheet, "Résumé");
-    XLSX.utils.book_append_sheet(workbook, produit_fini_dataSheet, "Produit fini");
-    XLSX.utils.book_append_sheet(workbook, ecartsSheet, "Écarts");
-    XLSX.utils.book_append_sheet(workbook, defautsSheet, "Défauts");
+  XLSX.writeFile(
+    workbook,
+    `rapport_excel_qualite_${new Date().toISOString().split("T")[0]}.xlsx`
+  );
 
-    XLSX.writeFile(
-      workbook,
-      `rapport_excel_qualite_${new Date().toISOString().split("T")[0]}.xlsx`
-    );
-
-    alert("Export Excel professionnel généré avec succès ✅");
-  }
+  alert("Export Excel professionnel généré avec succès ✅");
+}
   function importBackup(event) {
     const file = event.target.files[0];
 
