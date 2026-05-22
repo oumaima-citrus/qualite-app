@@ -289,7 +289,7 @@ function App() {
   let totalNonConformes = 0;
 
   const defautsCount = {};
-
+console.log("sourceData =", sourceData);
  if (!sourceData || sourceData.length === 0) {
   alert("Aucune donnée à exporter.");
   return;
