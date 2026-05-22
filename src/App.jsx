@@ -198,10 +198,7 @@ function App() {
  function exportExcel() {
   console.log("HISTORY =", history);
 
-  const sourceData =
-    history && history.length > 0
-      ? history
-      : JSON.parse(localStorage.getItem("controls")) || [];
+  const sourceData = Array.isArray(history) ? history : [];
 
   console.log("SOURCE DATA:", sourceData);
 
