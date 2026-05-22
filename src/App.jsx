@@ -379,7 +379,7 @@ console.log("FULL RECORD =", record);
           record.signature || "",
         ]);
 
-        (record.ecarts.defauts || []).forEach((d) => {
+        (record.defects_list || []).forEach((d) => {
 
           if (!defautsCount[d.type]) {
             defautsCount[d.type] = 0;
