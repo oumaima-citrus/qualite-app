@@ -196,6 +196,7 @@ function App() {
     alert("Sauvegarde exportée avec succès ✅");
   }
  function exportExcel() {
+  alert("export khdama");
   console.log("HISTORY =", history);
 
   const sourceData = Array.isArray(history) ? history : [];
