@@ -290,9 +290,7 @@ function App() {
 
   const defautsCount = {};
 
-  Object.keys(allData).forEach((dateKey) => {
-
-    (allData[dateKey] || []).forEach((record) => {
+ (sourceData || []).forEach((record) => {
 console.log("FULL RECORD =", record);
       console.log("RECORD:", record);
 
@@ -322,7 +320,7 @@ console.log("FULL RECORD =", record);
             : "0%";
 
         produit_fini_dataRows.push([
-          record.date || dateKey,
+          record.date || "",
           record.createdAt || "",
           record.lot_number || record.lot || "",
           record.campagne || "",
@@ -363,7 +361,7 @@ console.log("FULL RECORD =", record);
             : "0%";
 
         ecartsRows.push([
-          record.date || dateKey,
+          record.date || "",
           record.createdAt || "",
           record.lot_number || record.lot || "",
           record.campagne || "",
@@ -390,7 +388,7 @@ console.log("FULL RECORD =", record);
           defautsCount[d.type] += Number(d.qty || 0);
 
           defautsRows.push([
-            record.date || dateKey,
+            record.date || "",
             record.createdAt || "",
             record.lot_number || record.lot || "",
             record.ecarts.calibre || "",
@@ -403,7 +401,7 @@ console.log("FULL RECORD =", record);
         });
       }
     });
-  });
+ 
 
   console.log("TOTAL CONTROLES:", totalControles);
 
