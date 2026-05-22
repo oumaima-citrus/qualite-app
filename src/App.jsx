@@ -449,7 +449,8 @@ sourceData.forEach((record) => {
     XLSX.utils.aoa_to_sheet(produit_fini_dataRows);
   const ecartsSheet = XLSX.utils.aoa_to_sheet(ecartsRows);
   const defautsSheet = XLSX.utils.aoa_to_sheet(defautsRows);
-
+console.log("PF ROWS =", produit_fini_dataRows);
+console.log("ECARTS ROWS =", ecartsRows);
   XLSX.utils.book_append_sheet(workbook, resumeSheet, "Résumé");
   XLSX.utils.book_append_sheet(workbook, produit_fini_dataSheet, "Produit fini");
   XLSX.utils.book_append_sheet(workbook, ecartsSheet, "Écarts");
