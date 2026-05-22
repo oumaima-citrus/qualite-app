@@ -290,9 +290,12 @@ function App() {
 
   const defautsCount = {};
 
- (sourceData || []).forEach((record) => {
-console.log("FULL RECORD =", record);
-      console.log("RECORD:", record);
+ if (!sourceData || sourceData.length === 0) {
+  alert("Aucune donnée à exporter.");
+  return;
+}
+
+sourceData.forEach((record) => {
 
       totalControles += 1;
 
