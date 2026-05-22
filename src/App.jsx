@@ -196,7 +196,22 @@ function App() {
     alert("Sauvegarde exportée avec succès ✅");
   }
   function exportExcel() {
-    const allData = JSON.parse(localStorage.getItem("dailyLots")) || {};
+   
+  const allData = {};
+
+const sourceData = history && history.length > 0
+  ? history
+  : JSON.parse(localStorage.getItem("controls")) || [];
+
+sourceData.forEach((record) => {
+  const dateKey = record.date || "Sans date";
+
+  if (!allData[dateKey]) {
+    allData[dateKey] = [];
+  }
+
+  allData[dateKey].push(record);
+});
 
     const produit_fini_dataRows = [
       [
@@ -262,12 +277,13 @@ function App() {
     let totalNonConformes = 0;
 
     const defautsCount = {};
-
+console.log("ALL DATA:", allData);
     Object.keys(allData).forEach((dateKey) => {
       (allData[dateKey] || []).forEach((record) => {
         totalControles += 1;
         totalLotsSet.add(record.lot_number);
-
+console.log("TYPE:", record.type);
+console.log("RECORD:", record);
         if (record.type === "pf" && record.produit_fini_data) {
           const total = Number(record.produit_fini_data.total || 0);
           const conforme = Number(record.produit_fini_data.conforme || 0);
